@@ -1,7 +1,8 @@
 # Download ximalaya podcast
 
 **Usage:**  
-python xima.py <album_no>
+python xima.py <album_no> <page_num>
+example: python xima.py 16123812 3
 
 For example:  
 http://www.ximalaya.com/lishi/3703879/  
