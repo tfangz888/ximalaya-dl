@@ -3,15 +3,16 @@ import os, sys
 import concurrent.futures
 from itertools import repeat
 
+pageNum = sys.argv[2].strip()
 class XimaScraper:
     def __init__(self, album_no):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0'
-        }
+        }		
         sort_order = '-1'
         album_size = '1000'
         base_url = 'http://www.ximalaya.com/revision/play/'
-        url = base_url+'album?albumId={}&pageNum=1&sort={}&pageSize={}'.format(album_no, sort_order, album_size)
+        url = base_url+'album?albumId={}&pageNum={}&sort={}&pageSize={}'.format(album_no, pageNum, sort_order, album_size)
         req = requests.get(url, headers=headers)
         self.full_tracks_info = req.json()['data']['tracksAudioPlay']
         self.album_name = self.full_tracks_info[0]['albumName']
@@ -42,12 +43,14 @@ def download_from_url(filedir, idx, trackname, url):
 # download the file then record the downloaded url to a file
 def download_and_record(filedir, idx, trackname, url, recordfile):
     download_from_url(filedir, idx, trackname, url)
-    with open(recordfile, "a") as f:
+    with open(recordfile, "w") as f:
         f.write(trackname+'|')
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    print('python xima.py albumNum pageNum')
+    print('python xima.py 16123812 3')
+    if len(sys.argv) != 3:
         raise ValueError('Need Album Number')
     album_no = sys.argv[1].strip()
     xima = XimaScraper(album_no)
@@ -55,14 +58,7 @@ if __name__ == '__main__':
     if not os.path.exists(filedir):
         os.makedirs(filedir)
     recordfile = os.path.join(filedir, 'record')
-    # check existing record file
-    try:
-        with open(recordfile, "r") as f:
-            downloaded_tracks_raw = f.read()
-        downloaded_tracks = downloaded_tracks_raw.split('|')
-        to_download = [e for e in xima.get_index_trackname_url() if e[1] not in downloaded_tracks]
-    except FileNotFoundError:
-        to_download = xima.get_index_trackname_url()
+    to_download = xima.get_index_trackname_url()
     if to_download:
         print('total number of episodes to download: '+str(len(to_download)))
         idxs = [e[0] for e in to_download]
@@ -73,4 +69,3 @@ if __name__ == '__main__':
         print('finished all downloading')
     else:
         print('all episodes are already downloaded')
-
