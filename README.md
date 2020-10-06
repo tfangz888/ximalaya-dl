@@ -19,3 +19,8 @@ pip install requests
 
 **Note:**  
 下载的MP3在windows下能播放，但在某些播放器里播放不了。这时需要用格式工厂全部转换成MP3一次就可以播放了。
+
+
+这个文本只支持下载第一页
+python xima.py 16123812
+如果要下载第二页， 需要修改pageNum
